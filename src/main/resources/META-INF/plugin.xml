@@ -1,0 +1,25 @@
+<idea-plugin>
+    <id>io.github.yunkuilu.copy-reference</id>
+    <name>Copy Reference</name>
+    <vendor url="https://www.yourcompany.com">YourCompany</vendor>
+
+    <description><![CDATA[
+        Copy AI-agent-friendly file references from editor and project tree context menus.
+        ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <resource-bundle>messages.MyMessageBundle</resource-bundle>
+
+    <actions>
+        <action id="io.github.yunkuilu.copy-reference.CopyReferenceAction"
+                class="actions.CopyReferenceAction"
+                text="Copy AI File Reference"
+                description="Copy an AI-agent-friendly file reference">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
