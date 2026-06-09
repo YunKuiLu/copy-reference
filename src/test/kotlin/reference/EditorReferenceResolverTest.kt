@@ -103,6 +103,29 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
         }
     }
 
+    fun testNoSelectionInsideJavaLocalClassUsesLocalClassRange() {
+        val psiFile = createProjectPsiFile(
+            "JavaLocalClass.java",
+            """
+            class Foo {
+                void first() {
+                    class Local {
+                        int value;
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("value")
+
+            assertEquals(
+                ReferenceTarget.File("JavaLocalClass.java", LineRange(3, 5)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
+    }
+
     fun testNoSelectionInsideKotlinFunctionUsesFunctionRange() {
         val psiFile = createProjectPsiFile(
             "KotlinFunction.kt",
@@ -138,6 +161,29 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
 
             assertEquals(
                 ReferenceTarget.File("KotlinClass.kt", LineRange(1, 3)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
+    }
+
+    fun testNoSelectionInsideKotlinObjectNestedInFunctionUsesObjectRange() {
+        val psiFile = createProjectPsiFile(
+            "KotlinNestedObject.kt",
+            """
+            class Foo {
+                fun first() {
+                    object LocalConfig {
+                        val enabled = true
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("enabled")
+
+            assertEquals(
+                ReferenceTarget.File("KotlinNestedObject.kt", LineRange(3, 5)),
                 resolver.resolve(project, editor, psiFile, clickOffset),
             )
         }
