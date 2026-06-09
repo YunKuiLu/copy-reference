@@ -59,6 +59,86 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
         }
     }
 
+    fun testNoSelectionInsideJavaMethodUsesMethodRange() {
+        myFixture.configureByText(
+            "Foo.java",
+            """
+            class Foo {
+                void first() {
+                    System.out.println("first");
+                }
+
+                void second() {
+                    System.out.println("second");
+                }
+            }
+            """.trimIndent(),
+        )
+        val editor = myFixture.editor
+        val clickOffset = editor.document.text.indexOf("println(\"first\")")
+
+        assertEquals(
+            ReferenceTarget.File("Foo.java", LineRange(2, 4)),
+            resolver.resolve(project, editor, myFixture.file, clickOffset),
+        )
+    }
+
+    fun testNoSelectionInsideJavaClassUsesClassRange() {
+        myFixture.configureByText(
+            "Foo.java",
+            """
+            class Foo {
+                int value;
+            }
+            """.trimIndent(),
+        )
+        val editor = myFixture.editor
+        val clickOffset = editor.document.text.indexOf("value")
+
+        assertEquals(
+            ReferenceTarget.File("Foo.java", LineRange(1, 3)),
+            resolver.resolve(project, editor, myFixture.file, clickOffset),
+        )
+    }
+
+    fun testNoSelectionInsideKotlinFunctionUsesFunctionRange() {
+        myFixture.configureByText(
+            "Foo.kt",
+            """
+            class Foo {
+                fun first() {
+                    println("first")
+                }
+            }
+            """.trimIndent(),
+        )
+        val editor = myFixture.editor
+        val clickOffset = editor.document.text.indexOf("println(\"first\")")
+
+        assertEquals(
+            ReferenceTarget.File("Foo.kt", LineRange(2, 4)),
+            resolver.resolve(project, editor, myFixture.file, clickOffset),
+        )
+    }
+
+    fun testNoSelectionInsideKotlinClassUsesClassRange() {
+        myFixture.configureByText(
+            "Foo.kt",
+            """
+            class Foo {
+                val value = 1
+            }
+            """.trimIndent(),
+        )
+        val editor = myFixture.editor
+        val clickOffset = editor.document.text.indexOf("value")
+
+        assertEquals(
+            ReferenceTarget.File("Foo.kt", LineRange(1, 3)),
+            resolver.resolve(project, editor, myFixture.file, clickOffset),
+        )
+    }
+
     private fun createProjectPsiFile(relativePath: String, content: String): PsiFile {
         val path = projectBasePath().resolve(relativePath)
         Files.createDirectories(path.parent ?: projectBasePath())

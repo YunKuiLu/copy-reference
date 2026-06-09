@@ -3,8 +3,13 @@ package reference
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtNamedFunction
 
 class EditorReferenceResolver(
     private val pathService: ReferencePathService,
@@ -48,7 +53,18 @@ class EditorReferenceResolver(
     }
 
     private fun findEnclosingDeclaration(element: PsiElement): PsiElement? {
-        return null
+        val method = PsiTreeUtil.getParentOfType(
+            element,
+            PsiMethod::class.java,
+            KtNamedFunction::class.java,
+        )
+        if (method != null) return method
+
+        return PsiTreeUtil.getParentOfType(
+            element,
+            PsiClass::class.java,
+            KtClassOrObject::class.java,
+        )
     }
 
     private fun PsiElement.toLineRange(document: Document): LineRange {
