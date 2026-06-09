@@ -2,13 +2,14 @@ package reference
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import java.awt.Component
 import java.awt.Point
-import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
 
 class ReferenceTargetResolver(
@@ -49,13 +50,14 @@ class ReferenceTargetResolver(
         val psiFile = event.getData(CommonDataKeys.PSI_FILE)
             ?: PsiDocumentManager.getInstance(project).getPsiFile(editor.document)
             ?: return emptyList()
-        val clickOffset = editorClickOffset(editor)
+        val clickOffset = editorClickOffset(editor, event)
         return listOfNotNull(editorResolver.resolve(project, editor, psiFile, clickOffset))
     }
 
-    private fun editorClickOffset(editor: Editor): Int? {
-        val mouseEvent = (editor as? EditorEx)?.lastMouseEvent() ?: return null
-        return offsetFromEditorMousePoint(editor, mouseEvent.point, mouseEvent.component)
+    private fun editorClickOffset(editor: Editor, event: AnActionEvent): Int? {
+        val point = event.getData(PlatformDataKeys.CONTEXT_MENU_POINT) ?: return null
+        val sourceComponent = event.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT) ?: return null
+        return offsetFromEditorMousePoint(editor, point, sourceComponent)
     }
 
     fun offsetFromEditorMousePoint(editor: Editor, point: Point, sourceComponent: Component): Int? {
@@ -74,36 +76,5 @@ class ReferenceTargetResolver(
             component == gutterComponent ||
             SwingUtilities.isDescendingFrom(component, contentComponent) ||
             (gutterComponent != null && SwingUtilities.isDescendingFrom(component, gutterComponent))
-    }
-
-    private fun EditorEx.lastMouseEvent(): MouseEvent? {
-        val getterEvent = runCatching {
-            javaClass.methods
-                .firstOrNull { method ->
-                    method.name == "getLastMouseEvent" &&
-                        method.parameterCount == 0 &&
-                        MouseEvent::class.java.isAssignableFrom(method.returnType)
-                }
-                ?.invoke(this) as? MouseEvent
-        }.getOrNull()
-        if (getterEvent != null) {
-            return getterEvent
-        }
-
-        return runCatching {
-            var type: Class<*>? = javaClass
-            while (type != null) {
-                val field = type.declaredFields.firstOrNull {
-                    it.name == "lastMouseEvent" &&
-                        MouseEvent::class.java.isAssignableFrom(it.type)
-                }
-                if (field != null) {
-                    field.isAccessible = true
-                    return@runCatching field.get(this) as? MouseEvent
-                }
-                type = type.superclass
-            }
-            null
-        }.getOrNull()
     }
 }
