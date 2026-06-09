@@ -60,8 +60,8 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
     }
 
     fun testNoSelectionInsideJavaMethodUsesMethodRange() {
-        myFixture.configureByText(
-            "Foo.java",
+        val psiFile = createProjectPsiFile(
+            "JavaMethod.java",
             """
             class Foo {
                 void first() {
@@ -74,36 +74,38 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
             }
             """.trimIndent(),
         )
-        val editor = myFixture.editor
-        val clickOffset = editor.document.text.indexOf("println(\"first\")")
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("println(\"first\")")
 
-        assertEquals(
-            ReferenceTarget.File("Foo.java", LineRange(2, 4)),
-            resolver.resolve(project, editor, myFixture.file, clickOffset),
-        )
+            assertEquals(
+                ReferenceTarget.File("JavaMethod.java", LineRange(2, 4)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
     }
 
     fun testNoSelectionInsideJavaClassUsesClassRange() {
-        myFixture.configureByText(
-            "Foo.java",
+        val psiFile = createProjectPsiFile(
+            "JavaClass.java",
             """
             class Foo {
                 int value;
             }
             """.trimIndent(),
         )
-        val editor = myFixture.editor
-        val clickOffset = editor.document.text.indexOf("value")
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("value")
 
-        assertEquals(
-            ReferenceTarget.File("Foo.java", LineRange(1, 3)),
-            resolver.resolve(project, editor, myFixture.file, clickOffset),
-        )
+            assertEquals(
+                ReferenceTarget.File("JavaClass.java", LineRange(1, 3)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
     }
 
     fun testNoSelectionInsideKotlinFunctionUsesFunctionRange() {
-        myFixture.configureByText(
-            "Foo.kt",
+        val psiFile = createProjectPsiFile(
+            "KotlinFunction.kt",
             """
             class Foo {
                 fun first() {
@@ -112,31 +114,52 @@ class EditorReferenceResolverTest : BasePlatformTestCase() {
             }
             """.trimIndent(),
         )
-        val editor = myFixture.editor
-        val clickOffset = editor.document.text.indexOf("println(\"first\")")
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("println(\"first\")")
 
-        assertEquals(
-            ReferenceTarget.File("Foo.kt", LineRange(2, 4)),
-            resolver.resolve(project, editor, myFixture.file, clickOffset),
-        )
+            assertEquals(
+                ReferenceTarget.File("KotlinFunction.kt", LineRange(2, 4)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
     }
 
     fun testNoSelectionInsideKotlinClassUsesClassRange() {
-        myFixture.configureByText(
-            "Foo.kt",
+        val psiFile = createProjectPsiFile(
+            "KotlinClass.kt",
             """
             class Foo {
                 val value = 1
             }
             """.trimIndent(),
         )
-        val editor = myFixture.editor
-        val clickOffset = editor.document.text.indexOf("value")
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("value")
 
-        assertEquals(
-            ReferenceTarget.File("Foo.kt", LineRange(1, 3)),
-            resolver.resolve(project, editor, myFixture.file, clickOffset),
+            assertEquals(
+                ReferenceTarget.File("KotlinClass.kt", LineRange(1, 3)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
+    }
+
+    fun testNoSelectionInsideKotlinObjectUsesObjectRange() {
+        val psiFile = createProjectPsiFile(
+            "Config.kt",
+            """
+            object AppConfig {
+                val enabled = true
+            }
+            """.trimIndent(),
         )
+        withEditor(psiFile) { editor ->
+            val clickOffset = editor.document.text.indexOf("enabled")
+
+            assertEquals(
+                ReferenceTarget.File("Config.kt", LineRange(1, 3)),
+                resolver.resolve(project, editor, psiFile, clickOffset),
+            )
+        }
     }
 
     private fun createProjectPsiFile(relativePath: String, content: String): PsiFile {
