@@ -2,6 +2,7 @@ package actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import reference.ClipboardService
 import reference.EditorReferenceResolver
 import reference.ProjectViewReferenceResolver
@@ -21,8 +22,11 @@ class CopyReferenceAction : AnAction() {
     )
 
     override fun update(event: AnActionEvent) {
-        val targets = resolver.resolve(event)
-        event.presentation.isEnabledAndVisible = targets.isNotEmpty()
+        event.presentation.isEnabledAndVisible = resolver.hasResolvableContext(event)
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 
     override fun actionPerformed(event: AnActionEvent) {
