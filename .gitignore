@@ -4,6 +4,7 @@
 build
 
 .codegraph
+.worktrees/
 
 AGENTS.md
 **/superpowers
