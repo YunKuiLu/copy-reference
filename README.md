@@ -18,3 +18,7 @@ The plugin copies references as plain text. It does not copy source code and doe
 - Run tests: ./gradlew test
 - Build the plugin: ./gradlew buildPlugin
 - Run a sandbox IDE: ./gradlew runIde
+
+## License
+
+MIT License. See [LICENSE](LICENSE).

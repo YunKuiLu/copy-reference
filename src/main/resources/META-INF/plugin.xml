@@ -22,8 +22,8 @@
                 class="actions.CopyReferenceAction"
                 text="Copy AI File Reference"
                 description="Copy an AI-agent-friendly file reference">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="CopyAsRichText"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="CutCopyPasteGroup"/>
         </action>
     </actions>
 </idea-plugin>
