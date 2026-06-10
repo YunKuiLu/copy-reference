@@ -6,6 +6,10 @@ plugins {
     id("org.jetbrains.intellij.platform")
 }
 
+intellijPlatform {
+    instrumentCode = false
+}
+
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
 dependencies {
     testImplementation(libs.junit)

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>io.github.yunkuilu.copy-reference</id>
     <name>Copy Reference</name>
-    <vendor url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor url="https://github.com/yunkuilu">yunkuilu</vendor>
 
     <description><![CDATA[
         Copy AI-agent-friendly file references from editor and project tree context menus.
@@ -12,6 +12,10 @@
     <depends>org.jetbrains.kotlin</depends>
 
     <resource-bundle>messages.MyMessageBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true"/>
+    </extensions>
 
     <actions>
         <action id="io.github.yunkuilu.copy-reference.CopyReferenceAction"
